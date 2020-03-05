@@ -28,10 +28,16 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) {
     match ctx.key {
         None => {},
         Some(key) => match key {
+            // Arrows
             VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
             VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
             VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
             VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
+            // Neo - nrtd
+            VirtualKeyCode::N => try_move_player(-1, 0, &mut gs.ecs),
+            VirtualKeyCode::D => try_move_player(1, 0, &mut gs.ecs),
+            VirtualKeyCode::T => try_move_player(0, -1, &mut gs.ecs),
+            VirtualKeyCode::R => try_move_player(0, 1, &mut gs.ecs),
             _ => {},
         }
     }
