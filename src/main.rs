@@ -4,6 +4,9 @@ use specs::prelude::*;
 #[macro_use]
 extern crate specs_derive;
 
+mod components;
+use components::*;
+
 mod map;
 use map::*;
 
@@ -12,6 +15,9 @@ use player::*;
 
 mod rect;
 use rect::*;
+
+mod visibility_system;
+use visibility_system::*;
 
 fn main() {
     use rltk::RltkBuilder;
@@ -27,11 +33,14 @@ fn main() {
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
+    gs.ecs.register::<Viewshed>();
 
-    let (rooms, map) = new_map_rooms_and_corridoors();
+    let map = Map::new_map_rooms_and_corridoors();
+    // let map = Map::new_map_test();
+    let (player_x, player_y) = map.rooms[0].center();
+
     gs.ecs.insert(map);
 
-    let (player_x, player_y) = rooms[0].center();
     gs.ecs
         .create_entity()
         .with(Player)
@@ -40,6 +49,11 @@ fn main() {
             glyph: rltk::to_cp437('@'),
             fg: RGB::named(rltk::YELLOW),
             bg: RGB::named(rltk::BLACK),
+        })
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+            dirty: true,
         })
         .build();
 
@@ -57,8 +71,7 @@ impl GameState for State {
         player_input(self, ctx);
         self.run_systems();
 
-        let map = self.ecs.fetch::<Vec<TileType>>();
-        draw_map(&map, ctx);
+        draw_map(&self.ecs, ctx);
 
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
@@ -71,18 +84,22 @@ impl GameState for State {
 
 impl State {
     fn run_systems(&mut self) {
+        let mut vis = VisibilitySystem;
+
+        vis.run_now(&self.ecs);
+
         self.ecs.maintain();
     }
 }
 
 #[derive(Component)]
-struct Position {
+pub struct Position {
     x: i32,
     y: i32,
 }
 
 #[derive(Component)]
-struct Renderable {
+pub struct Renderable {
     glyph: u8,
     fg: RGB,
     bg: RGB,
