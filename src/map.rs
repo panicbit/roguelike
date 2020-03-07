@@ -39,6 +39,7 @@ impl Map {
 
     /// Makes a map with solid boundaries and 400 randomly placed walls.
     /// No guarantees that it won't look awful.
+    #[allow(unused)]
     pub fn new_map_test() -> Self {
         let width = 80;
         let height = 50;

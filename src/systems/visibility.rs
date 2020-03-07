@@ -3,9 +3,9 @@ use crate::components::Viewshed;
 use crate::{map::Map, Position, player::Player};
 use rltk::{field_of_view, Point};
 
-pub struct VisibilitySystem;
+pub struct Visibility;
 
-impl<'a> System<'a> for VisibilitySystem {
+impl<'a> System<'a> for Visibility {
     type SystemData = (
         WriteExpect<'a, Map>,
         Entities<'a>,
